@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { fileContents } from "./artifacts.ts";
+import { fileContents } from "../src/lib/artifacts.ts";
 
 describe("fileContents", () => {
   it("emits a file:// URI from a native path", () => {

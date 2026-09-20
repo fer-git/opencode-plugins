@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isHttpUrl } from "./url.ts";
+import { isHttpUrl } from "../src/lib/url.ts";
 
 describe("isHttpUrl", () => {
   it("accepts http(s)", () => {

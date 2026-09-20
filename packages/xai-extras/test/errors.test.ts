@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CONNECT_MESSAGE, parseXaiJson, xaiHttpError } from "./errors.ts";
+import { CONNECT_MESSAGE, parseXaiJson, xaiHttpError } from "../src/lib/errors.ts";
 
 describe("xaiHttpError", () => {
   it("maps 401/403 to /connect", () => {

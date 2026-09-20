@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { toWebSearchResults } from "./citations.ts";
+import { toWebSearchResults } from "../src/lib/citations.ts";
 
 describe("toWebSearchResults", () => {
   it("returns no rows when the body has neither text nor urls", () => {

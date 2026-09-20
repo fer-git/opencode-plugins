@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildTextToSpeechBody } from "./tts.ts";
+import { buildTextToSpeechBody } from "../src/lib/tts.ts";
 
 describe("buildTextToSpeechBody", () => {
   it("rejects empty or whitespace text", () => {

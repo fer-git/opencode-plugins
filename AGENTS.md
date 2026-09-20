@@ -8,6 +8,6 @@
 - New plugins are new directories under `packages/`. Do not dump a second plugin into `xai-extras` unless it is the same server `id`.
 - Stack: pnpm, `tsc --noEmit`, oxlint, oxfmt, vitest. No bun as package manager. No `Bun.spawn` in server plugins.
 - Paths must work on Windows, macOS, and Linux: `node:path` `join`, `pathToFileURL` for attachments, `fileURLToPath` for `file://` inputs. Do not concatenate `file://` onto a native path.
-- Tests are unit-only (builders/errors). Live SuperGrok is a local smoke, not CI.
+- Tests live in each package’s `test/` directory (not next to `src/`). Unit-only (builders/errors). Live SuperGrok is a local smoke, not CI.
 - Package READMEs are for OpenCode V2 **end users**. No local home paths, no loader-bug notes, no changelog-in-README. Put maintainer notes here.
 - User-facing package changes need `pnpm changeset` (patch/minor/major). Do not hand-edit version numbers or invent tags. Release PRs come from `.github/workflows/release.yml`.

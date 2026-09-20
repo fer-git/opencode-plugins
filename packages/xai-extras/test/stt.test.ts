@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { buildSpeechToTextRequest } from "./stt.ts";
+import { buildSpeechToTextRequest } from "../src/lib/stt.ts";
 
 describe("buildSpeechToTextRequest", () => {
   it("requires file or url", async () => {

@@ -18,8 +18,7 @@
   "files": [
     "index.ts",
     "src",
-    "README.md",
-    "!src/**/*.test.ts"
+    "README.md"
   ],
   "type": "module",
   "main": "./index.ts",

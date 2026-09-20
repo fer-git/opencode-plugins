@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildXSearchTool, formatXSearchMarkdown } from "./xsearch.ts";
+import { buildXSearchTool, formatXSearchMarkdown } from "../src/lib/xsearch.ts";
 
 describe("buildXSearchTool", () => {
   it("requires a 2+ character query", () => {

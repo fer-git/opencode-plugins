@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildImagineVideoBody } from "./video.ts";
+import { buildImagineVideoBody } from "../src/lib/video.ts";
 
 describe("buildImagineVideoBody", () => {
   it("requires a prompt", () => {

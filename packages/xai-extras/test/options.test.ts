@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { optionBoolean, optionString } from "./options.ts";
+import { optionBoolean, optionString } from "../src/lib/options.ts";
 
 describe("optionString", () => {
   it("returns fallback for empty or whitespace", () => {

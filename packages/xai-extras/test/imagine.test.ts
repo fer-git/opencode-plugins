@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildImagineImageBody } from "./imagine.ts";
+import { buildImagineImageBody } from "../src/lib/imagine.ts";
 
 describe("buildImagineImageBody", () => {
   it("requires a prompt", () => {

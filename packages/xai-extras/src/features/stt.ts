@@ -106,7 +106,7 @@ function multipartBody(
   if (req.diarize) form.append("diarize", "true");
   if (req.url) form.append("url", req.url);
   if (file) {
-    form.append("file", new Blob([file.bytes]), file.name);
+    form.append("file", new File([file.bytes.slice()], file.name));
   }
   return form;
 }

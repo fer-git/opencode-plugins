@@ -6,3 +6,4 @@ coverage
 Thumbs.db
 .turbo
 .pnpm-store
+.vitest

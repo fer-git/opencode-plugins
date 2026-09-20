@@ -14,6 +14,12 @@ This is not Grok Build. You do not paste a key into this plugin.
 ## Install
 
 ```sh
+opencode plugin add opencode-xai-extras
+```
+
+**Git:**
+
+```sh
 opencode plugin add 'github:fer-git/opencode-plugins#main::path:packages/xai-extras'
 ```
 

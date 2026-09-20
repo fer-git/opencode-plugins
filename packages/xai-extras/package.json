@@ -1,7 +1,6 @@
 {
   "name": "opencode-xai-extras",
   "version": "0.0.2",
-  "private": true,
   "description": "OpenCode V2 plugin: xAI SuperGrok web search, X search, Grok Imagine, speech-to-text, and text-to-speech.",
   "keywords": [
     "grok",
@@ -24,5 +23,8 @@
   "main": "./index.ts",
   "exports": {
     ".": "./index.ts"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

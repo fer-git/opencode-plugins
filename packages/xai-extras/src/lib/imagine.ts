@@ -6,8 +6,9 @@ import {
   writeArtifact,
   type ArtifactFile,
 } from "./artifacts.ts";
-import { enumField } from "./enum.ts";
+import { XAI_URL } from "./constants.ts";
 import { parseXaiJson, xaiHttpError } from "./errors.ts";
+import { enumField } from "./util.ts";
 
 const IMAGE_ASPECT = [
   "1:1",
@@ -30,7 +31,6 @@ const IMAGE_ASPECT = [
 
 const IMAGE_RESOLUTION = ["1k", "1.5k", "2k"] as const;
 const IMAGE_QUALITY = ["low", "medium", "auto"] as const;
-export const DEFAULT_IMAGE_MODEL = "grok-imagine-image-2.0";
 
 export const IMAGINE_IMAGE_INPUT_SCHEMA = {
   type: "object",
@@ -100,7 +100,7 @@ export async function generateImagineImages(input: {
   artifactsDir: string;
   signal: AbortSignal;
 }): Promise<{ files: ArtifactFile[] }> {
-  const response = await fetch("https://api.x.ai/v1/images/generations", {
+  const response = await fetch(XAI_URL.imagesGenerations, {
     method: "POST",
     signal: input.signal,
     headers: {

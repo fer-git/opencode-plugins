@@ -1,4 +1,5 @@
-import { isHttpUrl } from "./url.ts";
+import { XAI_ORIGIN } from "./constants.ts";
+import { isHttpUrl } from "./util.ts";
 
 const SNIPPET_RADIUS = 220;
 
@@ -113,7 +114,7 @@ export function toWebSearchResults(body: Record<string, unknown>): WebSearchResu
     if (!answer) return [];
     return [
       {
-        url: "https://x.ai/",
+        url: `${XAI_ORIGIN}/`,
         title: "xAI web search",
         content: answer,
         time: {},

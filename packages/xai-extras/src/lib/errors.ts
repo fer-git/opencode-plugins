@@ -1,7 +1,7 @@
+import { PACKAGE_NAME, XAI_MODELS_DOCS } from "./constants.ts";
+
 export const CONNECT_MESSAGE =
   "xAI is not connected in OpenCode. Run /connect and choose xAI (SuperGrok or API key).";
-
-const DOCS = "https://docs.x.ai/developers/models";
 
 export type XaiErrorKind = "search" | "image" | "video" | "stt" | "tts";
 
@@ -89,7 +89,7 @@ export function xaiHttpError(input: {
             : input.kind;
     const noun = input.kind === "tts" ? "voice" : "model";
     return new Error(
-      `xAI rejected ${input.kind} ${noun} "${input.model}". Set opencode-xai-extras option ${option} to a current ${catalog} ${noun}: ${DOCS}`,
+      `xAI rejected ${input.kind} ${noun} "${input.model}". Set ${PACKAGE_NAME} option ${option} to a current ${catalog} ${noun}: ${XAI_MODELS_DOCS}`,
     );
   }
   const label =

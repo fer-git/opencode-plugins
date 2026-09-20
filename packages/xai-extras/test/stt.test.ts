@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, onTestFinished } from "vitest";
 
 import { buildSpeechToTextRequest } from "../src/lib/stt.ts";
 
@@ -46,15 +46,12 @@ describe("buildSpeechToTextRequest", () => {
 
   it("reads a local file from a file:// URI", async () => {
     const dir = await mkdtemp(join(tmpdir(), "stt-"));
-    try {
-      const path = join(dir, "a.mp3");
-      await writeFile(path, "x");
-      const req = await buildSpeechToTextRequest({ file: pathToFileURL(path).href }, "m");
-      expect(req.file).toMatchObject({ path, name: "a.mp3" });
-      expect(req.file?.bytes).toEqual(new Uint8Array([0x78]));
-    } finally {
-      await rm(dir, { recursive: true, force: true });
-    }
+    onTestFinished(() => rm(dir, { recursive: true, force: true }));
+    const path = join(dir, "a.mp3");
+    await writeFile(path, "x");
+    const req = await buildSpeechToTextRequest({ file: pathToFileURL(path).href }, "m");
+    expect(req.file).toMatchObject({ path, name: "a.mp3" });
+    expect(req.file?.bytes).toEqual(new Uint8Array([0x78]));
   });
 
   it("builds a url request with model and format", async () => {

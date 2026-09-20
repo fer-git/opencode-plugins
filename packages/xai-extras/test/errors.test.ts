@@ -1,13 +1,11 @@
 import { describe, expect, it } from "vitest";
 
+import { PACKAGE_NAME } from "../src/lib/constants.ts";
 import { CONNECT_MESSAGE, parseXaiJson, xaiHttpError } from "../src/lib/errors.ts";
 
 describe("xaiHttpError", () => {
-  it("maps 401/403 to /connect", () => {
-    expect(xaiHttpError({ kind: "stt", model: "m", status: 401, body: "x" }).message).toBe(
-      CONNECT_MESSAGE,
-    );
-    expect(xaiHttpError({ kind: "search", model: "m", status: 403, body: "x" }).message).toBe(
+  it.each([401, 403])("maps %s to /connect", (status) => {
+    expect(xaiHttpError({ kind: "stt", model: "m", status, body: "x" }).message).toBe(
       CONNECT_MESSAGE,
     );
   });
@@ -51,7 +49,7 @@ describe("xaiHttpError", () => {
     });
     expect(err.message).toContain("sttModel");
     expect(err.message).toContain("bogus-stt");
-    expect(err.message).toContain("opencode-xai-extras");
+    expect(err.message).toContain(PACKAGE_NAME);
   });
 
   it("does not leak Bearer tokens", () => {

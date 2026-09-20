@@ -3,6 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { PACKAGE_NAME } from "./constants.ts";
+
 export type ArtifactFile = { path: string; mime: string; name: string };
 
 export async function ensureArtifactsDir(directory: string, artifactsDir: string): Promise<string> {
@@ -10,7 +12,7 @@ export async function ensureArtifactsDir(directory: string, artifactsDir: string
   try {
     await mkdir(dir, { recursive: true });
   } catch {
-    dir = join(tmpdir(), "opencode-xai-extras");
+    dir = join(tmpdir(), PACKAGE_NAME);
     await mkdir(dir, { recursive: true });
   }
   return dir;
@@ -38,7 +40,12 @@ export async function writeArtifact(dir: string, name: string, bytes: Uint8Array
   return path;
 }
 
-export function fileContents(files: Array<ArtifactFile>) {
+export function fileContents(files: Array<ArtifactFile>): Array<{
+  type: "file";
+  uri: string;
+  mime: string;
+  name: string;
+}> {
   return files.map((file) => ({
     type: "file" as const,
     uri: pathToFileURL(file.path).href,

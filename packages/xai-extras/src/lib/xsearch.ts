@@ -1,6 +1,7 @@
 import { collectHits, collectOutputText } from "./citations.ts";
+import { MIN_QUERY_LENGTH } from "./constants.ts";
 
-const DATE = /^\d{4}-\d{2}-\d{2}$/;
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_HANDLES = 20;
 
 export type XSearchInput = {
@@ -52,7 +53,7 @@ function parseHandles(value: unknown, field: string): string[] | undefined {
 
 function parseDate(value: unknown, field: string): string | undefined {
   if (value === undefined || value === null || value === "") return undefined;
-  if (typeof value !== "string" || !DATE.test(value)) {
+  if (typeof value !== "string" || !ISO_DATE.test(value)) {
     throw new Error(`${field} must be YYYY-MM-DD`);
   }
   return value;
@@ -65,8 +66,8 @@ function parseBool(value: unknown, field: string): boolean | undefined {
 }
 
 export function buildXSearchTool(input: XSearchInput): { query: string; tool: XSearchTool } {
-  if (typeof input.query !== "string" || input.query.trim().length < 2) {
-    throw new Error("x_search query must be at least 2 characters");
+  if (typeof input.query !== "string" || input.query.trim().length < MIN_QUERY_LENGTH) {
+    throw new Error(`x_search query must be at least ${MIN_QUERY_LENGTH} characters`);
   }
 
   const allowed = parseHandles(input.allowed_x_handles, "allowed_x_handles");
@@ -115,16 +116,16 @@ export const X_SEARCH_INPUT_SCHEMA = {
   additionalProperties: false,
   required: ["query"],
   properties: {
-    query: { type: "string", minLength: 2 },
+    query: { type: "string", minLength: MIN_QUERY_LENGTH },
     allowed_x_handles: {
       type: "array",
       items: { type: "string" },
-      maxItems: 20,
+      maxItems: MAX_HANDLES,
     },
     excluded_x_handles: {
       type: "array",
       items: { type: "string" },
-      maxItems: 20,
+      maxItems: MAX_HANDLES,
     },
     from_date: { type: "string", description: "Inclusive start date YYYY-MM-DD" },
     to_date: { type: "string", description: "Inclusive end date YYYY-MM-DD" },

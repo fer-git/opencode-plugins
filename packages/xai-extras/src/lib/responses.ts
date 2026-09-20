@@ -1,6 +1,5 @@
+import { XAI_URL } from "./constants.ts";
 import { parseXaiJson, xaiHttpError } from "./errors.ts";
-
-const XAI_RESPONSES_URL = "https://api.x.ai/v1/responses";
 
 export async function xaiResponses(input: {
   token: string;
@@ -9,7 +8,7 @@ export async function xaiResponses(input: {
   tools: unknown[];
   signal: AbortSignal;
 }): Promise<Record<string, unknown>> {
-  const response = await fetch(XAI_RESPONSES_URL, {
+  const response = await fetch(XAI_URL.responses, {
     method: "POST",
     signal: input.signal,
     headers: {

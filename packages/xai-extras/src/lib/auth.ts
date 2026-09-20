@@ -1,5 +1,5 @@
 import { CONNECT_MESSAGE } from "./errors.ts";
-import type { IntegrationCtx } from "./host.ts";
+import type { IntegrationCtx } from "./types.ts";
 
 type Credential = {
   type?: string;

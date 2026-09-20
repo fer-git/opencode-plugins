@@ -1,12 +1,12 @@
+import type { Stats } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
 import { basename } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { ensureArtifactsDir, writeArtifact, type ArtifactFile } from "./artifacts.ts";
+import { XAI_URL } from "./constants.ts";
 import { parseXaiJson, xaiHttpError } from "./errors.ts";
-import { isHttpUrl } from "./url.ts";
-
-export const DEFAULT_STT_MODEL = "grok-voice-transcribe-2.0";
+import { isHttpUrl } from "./util.ts";
 const MAX_FILE_BYTES = 500 * 1024 * 1024;
 
 export const SPEECH_TO_TEXT_INPUT_SCHEMA = {
@@ -69,7 +69,7 @@ export async function buildSpeechToTextRequest(
   if (hasFile) {
     if (typeof input.file !== "string") throw new Error("file must be a path or file:// URI");
     const path = localPath(input.file);
-    let info;
+    let info: Stats;
     try {
       info = await stat(path);
     } catch {
@@ -109,7 +109,7 @@ export async function transcribeAudio(input: {
   artifactsDir: string;
   signal: AbortSignal;
 }): Promise<{ text: string; language?: string; duration?: number; file: ArtifactFile }> {
-  const response = await fetch("https://api.x.ai/v1/stt", {
+  const response = await fetch(XAI_URL.stt, {
     method: "POST",
     signal: input.signal,
     headers: { Authorization: `Bearer ${input.token}` },

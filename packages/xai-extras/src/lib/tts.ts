@@ -1,8 +1,7 @@
 import { ensureArtifactsDir, writeArtifact, type ArtifactFile } from "./artifacts.ts";
-import { enumField } from "./enum.ts";
+import { XAI_URL } from "./constants.ts";
 import { xaiHttpError } from "./errors.ts";
-
-export const DEFAULT_TTS_VOICE = "eve";
+import { enumField } from "./util.ts";
 const TTS_LANGUAGES = [
   "auto",
   "en",
@@ -83,7 +82,7 @@ export async function generateSpeech(input: {
   artifactsDir: string;
   signal: AbortSignal;
 }): Promise<ArtifactFile> {
-  const response = await fetch("https://api.x.ai/v1/tts", {
+  const response = await fetch(XAI_URL.tts, {
     method: "POST",
     signal: input.signal,
     headers: {

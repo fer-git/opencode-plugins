@@ -3,41 +3,37 @@
 import { fileContents } from "./lib/artifacts.ts";
 import { isXaiAuthEvent, xaiBearer, xaiConnected } from "./lib/auth.ts";
 import { toWebSearchResults } from "./lib/citations.ts";
-import type { PluginContext } from "./lib/host.ts";
+import {
+  DEFAULT_ARTIFACTS_DIR,
+  DEFAULT_IMAGE_MODEL,
+  DEFAULT_SEARCH_MODEL,
+  DEFAULT_STT_MODEL,
+  DEFAULT_TTS_VOICE,
+  DEFAULT_VIDEO_MODEL,
+  MIN_QUERY_LENGTH,
+  PLUGIN_ID,
+  TIMEOUT_MS,
+} from "./lib/constants.ts";
 import {
   buildImagineImageBody,
-  DEFAULT_IMAGE_MODEL,
   generateImagineImages,
   IMAGINE_IMAGE_INPUT_SCHEMA,
 } from "./lib/imagine.ts";
-import { optionBoolean, optionString } from "./lib/options.ts";
 import { xaiResponses } from "./lib/responses.ts";
 import {
   buildSpeechToTextRequest,
-  DEFAULT_STT_MODEL,
   SPEECH_TO_TEXT_INPUT_SCHEMA,
   transcribeAudio,
 } from "./lib/stt.ts";
-import {
-  buildTextToSpeechBody,
-  DEFAULT_TTS_VOICE,
-  generateSpeech,
-  TEXT_TO_SPEECH_INPUT_SCHEMA,
-} from "./lib/tts.ts";
+import { buildTextToSpeechBody, generateSpeech, TEXT_TO_SPEECH_INPUT_SCHEMA } from "./lib/tts.ts";
+import type { PluginContext } from "./lib/types.ts";
+import { optionBoolean, optionString } from "./lib/util.ts";
 import {
   buildImagineVideoBody,
-  DEFAULT_VIDEO_MODEL,
   generateImagineVideo,
   IMAGINE_VIDEO_INPUT_SCHEMA,
-  VIDEO_TIMEOUT_MS,
 } from "./lib/video.ts";
 import { buildXSearchTool, formatXSearchMarkdown, X_SEARCH_INPUT_SCHEMA } from "./lib/xsearch.ts";
-
-const DEFAULT_SEARCH_MODEL = "grok-4.6";
-const X_SEARCH_TIMEOUT_MS = 180_000;
-const IMAGE_TIMEOUT_MS = 120_000;
-const STT_TIMEOUT_MS = 180_000;
-const TTS_TIMEOUT_MS = 120_000;
 
 function isAbortError(error: unknown, signal: AbortSignal): boolean {
   if (signal.aborted) return true;
@@ -45,7 +41,7 @@ function isAbortError(error: unknown, signal: AbortSignal): boolean {
 }
 
 export default {
-  id: "ferspective07.xai-extras",
+  id: PLUGIN_ID,
   async setup(ctx: PluginContext) {
     const searchModel = optionString(ctx.options.searchModel, DEFAULT_SEARCH_MODEL);
     const imageModel = optionString(ctx.options.imageModel, DEFAULT_IMAGE_MODEL);
@@ -53,7 +49,7 @@ export default {
     const sttModel = optionString(ctx.options.sttModel, DEFAULT_STT_MODEL);
     const ttsVoice = optionString(ctx.options.ttsVoice, DEFAULT_TTS_VOICE);
     const enableWebsearch = optionBoolean(ctx.options.websearch, true);
-    const artifactsDir = optionString(ctx.options.artifactsDir, ".opencode/artifacts");
+    const artifactsDir = optionString(ctx.options.artifactsDir, DEFAULT_ARTIFACTS_DIR);
     const source = { connected: await xaiConnected(ctx) };
     let disposeAuthWatch: (() => void) | undefined;
 
@@ -68,7 +64,7 @@ export default {
           execute: async ({ query }, { signal }) => {
             const q = query.trim();
             // Do not throw: the host maps provider execute failures to HTTP 503.
-            if (q.length < 2) return [];
+            if (q.length < MIN_QUERY_LENGTH) return [];
             const token = await xaiBearer(ctx);
             const body = await xaiResponses({
               token,
@@ -96,7 +92,7 @@ export default {
             }
           } catch (error) {
             if (isAbortError(error, controller.signal)) return;
-            console.error("ferspective07.xai-extras websearch auth watch ended");
+            console.error(`${PLUGIN_ID} websearch auth watch ended`);
           }
         })();
         disposeAuthWatch = () => controller.abort();
@@ -118,7 +114,7 @@ export default {
             model: searchModel,
             query,
             tools: [xTool],
-            signal: AbortSignal.timeout(X_SEARCH_TIMEOUT_MS),
+            signal: AbortSignal.timeout(TIMEOUT_MS.xSearch),
           });
           return { content: formatXSearchMarkdown(body) };
         },
@@ -137,7 +133,7 @@ export default {
             body,
             directory: ctx.location.directory,
             artifactsDir,
-            signal: AbortSignal.timeout(IMAGE_TIMEOUT_MS),
+            signal: AbortSignal.timeout(TIMEOUT_MS.image),
           });
           return {
             content: [
@@ -161,7 +157,7 @@ export default {
             body,
             directory: ctx.location.directory,
             artifactsDir,
-            signal: AbortSignal.timeout(VIDEO_TIMEOUT_MS),
+            signal: AbortSignal.timeout(TIMEOUT_MS.video),
           });
           return {
             content: [
@@ -191,7 +187,7 @@ export default {
             request,
             directory: ctx.location.directory,
             artifactsDir,
-            signal: AbortSignal.timeout(STT_TIMEOUT_MS),
+            signal: AbortSignal.timeout(TIMEOUT_MS.stt),
           });
           const meta = [
             result.language ? `language ${result.language}` : "",
@@ -221,7 +217,7 @@ export default {
             body,
             directory: ctx.location.directory,
             artifactsDir,
-            signal: AbortSignal.timeout(TTS_TIMEOUT_MS),
+            signal: AbortSignal.timeout(TIMEOUT_MS.tts),
           });
           return {
             content: [{ type: "text", text: "Generated speech." }, ...fileContents([file])],

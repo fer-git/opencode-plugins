@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { toWebSearchResults } from "../src/lib/citations.ts";
+import { XAI_ORIGIN } from "../src/lib/constants.ts";
 
 describe("toWebSearchResults", () => {
   it("returns no rows when the body has neither text nor urls", () => {
@@ -10,7 +11,7 @@ describe("toWebSearchResults", () => {
   it("falls back to an xAI web search row when there is text but no urls", () => {
     expect(toWebSearchResults({ output_text: "  hello  " })).toEqual([
       {
-        url: "https://x.ai/",
+        url: `${XAI_ORIGIN}/`,
         title: "xAI web search",
         content: "hello",
         time: {},
@@ -51,7 +52,7 @@ describe("toWebSearchResults", () => {
       }),
     ).toEqual([
       {
-        url: "https://x.ai/",
+        url: `${XAI_ORIGIN}/`,
         title: "xAI web search",
         content: "only text",
         time: {},

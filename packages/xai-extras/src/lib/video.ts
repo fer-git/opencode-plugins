@@ -1,12 +1,10 @@
 import { downloadBytes, ensureArtifactsDir, writeArtifact } from "./artifacts.ts";
-import { enumField } from "./enum.ts";
+import { TIMEOUT_MS, XAI_URL } from "./constants.ts";
 import { parseXaiJson, xaiHttpError } from "./errors.ts";
-import { isHttpUrl } from "./url.ts";
+import { enumField, isHttpUrl } from "./util.ts";
 
 const VIDEO_ASPECT = ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"] as const;
 const VIDEO_RESOLUTION = ["480p", "720p", "1080p"] as const;
-export const DEFAULT_VIDEO_MODEL = "grok-imagine-video-1.5";
-export const VIDEO_TIMEOUT_MS = 10 * 60 * 1000;
 const VIDEO_POLL_MS = 5_000;
 
 export const IMAGINE_VIDEO_INPUT_SCHEMA = {
@@ -96,10 +94,10 @@ async function pollVideo(requestId: string, token: string, model: string, signal
   const started = Date.now();
   while (true) {
     if (signal.aborted) throw new Error("imagine_video aborted");
-    if (Date.now() - started > VIDEO_TIMEOUT_MS) {
+    if (Date.now() - started > TIMEOUT_MS.video) {
       throw new Error("imagine_video timed out waiting for xAI");
     }
-    const response = await fetch(`https://api.x.ai/v1/videos/${requestId}`, {
+    const response = await fetch(XAI_URL.video(requestId), {
       signal,
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -145,7 +143,7 @@ export async function generateImagineVideo(input: {
   artifactsDir: string;
   signal: AbortSignal;
 }): Promise<{ path: string; mime: string; name: string; duration?: number }> {
-  const start = await fetch("https://api.x.ai/v1/videos/generations", {
+  const start = await fetch(XAI_URL.videosGenerations, {
     method: "POST",
     signal: input.signal,
     headers: {

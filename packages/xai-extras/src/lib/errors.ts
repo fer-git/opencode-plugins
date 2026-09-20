@@ -1,7 +1,4 @@
-import { PACKAGE_NAME, XAI_MODELS_DOCS } from "./constants.ts";
-
-export const CONNECT_MESSAGE =
-  "xAI is not connected in OpenCode. Run /connect and choose xAI (SuperGrok or API key).";
+import { CONNECT_MESSAGE, PACKAGE_NAME, XAI_MODELS_DOCS } from "./constants.ts";
 
 export type XaiErrorKind = "search" | "image" | "video" | "stt" | "tts";
 

@@ -1,7 +1,7 @@
-import { ensureArtifactsDir, writeArtifact, type ArtifactFile } from "./artifacts.ts";
-import { XAI_URL } from "./constants.ts";
-import { xaiHttpError } from "./errors.ts";
-import { enumField } from "./util.ts";
+import { ensureArtifactsDir, writeArtifact, type ArtifactFile } from "../lib/artifacts.ts";
+import { XAI_URL } from "../lib/constants.ts";
+import { xaiHttpError } from "../lib/errors.ts";
+import { enumField } from "../lib/util.ts";
 const TTS_LANGUAGES = [
   "auto",
   "en",
@@ -75,7 +75,7 @@ export function buildTextToSpeechBody(
   return body;
 }
 
-export async function generateSpeech(input: {
+export async function runTextToSpeech(input: {
   token: string;
   body: TextToSpeechBody;
   directory: string;

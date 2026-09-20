@@ -1,18 +1,8 @@
-import { XAI_ORIGIN } from "./constants.ts";
 import { isHttpUrl } from "./util.ts";
 
-const SNIPPET_RADIUS = 220;
-
-type Hit = {
+export type SearchHit = {
   url: string;
   title: string;
-};
-
-export type WebSearchResult = {
-  url: string;
-  title?: string;
-  content?: string;
-  time: { published?: number };
 };
 
 function hostname(url: string): string {
@@ -23,7 +13,7 @@ function hostname(url: string): string {
   }
 }
 
-function pushHit(hits: Hit[], seen: Set<string>, url: unknown) {
+function pushHit(hits: SearchHit[], seen: Set<string>, url: unknown) {
   if (!isHttpUrl(url) || seen.has(url)) return;
   seen.add(url);
   hits.push({ url, title: hostname(url) });
@@ -38,8 +28,8 @@ function asArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
-export function collectHits(body: Record<string, unknown>): Hit[] {
-  const hits: Hit[] = [];
+export function collectHits(body: Record<string, unknown>): SearchHit[] {
+  const hits: SearchHit[] = [];
   const seen = new Set<string>();
 
   for (const item of asArray(body.output)) {
@@ -95,40 +85,4 @@ export function collectOutputText(body: Record<string, unknown>): string {
     }
   }
   return parts.join("\n\n");
-}
-
-function snippetAround(answer: string, url: string): string | undefined {
-  const escaped = url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = answer.match(new RegExp(`\\[\\[\\d+\\]\\]\\(${escaped}\\)`));
-  if (!match || match.index === undefined) return undefined;
-  const start = Math.max(0, match.index - SNIPPET_RADIUS);
-  const end = Math.min(answer.length, match.index + match[0].length + SNIPPET_RADIUS);
-  return answer.slice(start, end).trim();
-}
-
-export function toWebSearchResults(body: Record<string, unknown>): WebSearchResult[] {
-  const hits = collectHits(body);
-  const answer = collectOutputText(body);
-
-  if (hits.length === 0) {
-    if (!answer) return [];
-    return [
-      {
-        url: `${XAI_ORIGIN}/`,
-        title: "xAI web search",
-        content: answer,
-        time: {},
-      },
-    ];
-  }
-
-  return hits.map((hit, index) => {
-    const snippet = index === 0 ? answer : snippetAround(answer, hit.url);
-    return {
-      url: hit.url,
-      title: hit.title,
-      ...(snippet ? { content: snippet } : {}),
-      time: {},
-    };
-  });
 }

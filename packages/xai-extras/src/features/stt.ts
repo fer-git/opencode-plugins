@@ -3,10 +3,11 @@ import { readFile, stat } from "node:fs/promises";
 import { basename } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ensureArtifactsDir, writeArtifact, type ArtifactFile } from "./artifacts.ts";
-import { XAI_URL } from "./constants.ts";
-import { parseXaiJson, xaiHttpError } from "./errors.ts";
-import { isHttpUrl } from "./util.ts";
+import { ensureArtifactsDir, writeArtifact, type ArtifactFile } from "../lib/artifacts.ts";
+import { XAI_URL } from "../lib/constants.ts";
+import { parseXaiJson, xaiHttpError } from "../lib/errors.ts";
+import { isHttpUrl } from "../lib/util.ts";
+
 const MAX_FILE_BYTES = 500 * 1024 * 1024;
 
 export const SPEECH_TO_TEXT_INPUT_SCHEMA = {
@@ -26,7 +27,7 @@ export type SpeechToTextRequest = {
   language?: string;
   format?: boolean;
   diarize?: boolean;
-  file?: { path: string; bytes: Uint8Array; name: string };
+  path?: string;
   url?: string;
 };
 
@@ -41,10 +42,10 @@ function localPath(file: string): string {
   return file;
 }
 
-export async function buildSpeechToTextRequest(
+export function buildSpeechToTextRequest(
   input: Record<string, unknown>,
   model: string,
-): Promise<SpeechToTextRequest> {
+): SpeechToTextRequest {
   const hasFile = input.file !== undefined && input.file !== null && input.file !== "";
   const hasUrl = input.url !== undefined && input.url !== null && input.url !== "";
   if (hasFile === hasUrl) {
@@ -68,17 +69,7 @@ export async function buildSpeechToTextRequest(
 
   if (hasFile) {
     if (typeof input.file !== "string") throw new Error("file must be a path or file:// URI");
-    const path = localPath(input.file);
-    let info: Stats;
-    try {
-      info = await stat(path);
-    } catch {
-      throw new Error(`speech_to_text file not found: ${path}`);
-    }
-    if (!info.isFile()) throw new Error(`speech_to_text file not found: ${path}`);
-    if (info.size > MAX_FILE_BYTES) throw new Error("speech_to_text file exceeds 500 MB");
-    const bytes = new Uint8Array(await readFile(path));
-    req.file = { path, bytes, name: basename(path) || "audio" };
+    req.path = localPath(input.file);
     return req;
   }
 
@@ -89,31 +80,50 @@ export async function buildSpeechToTextRequest(
   return req;
 }
 
-function multipartBody(req: SpeechToTextRequest): FormData {
+export async function readLocalAudio(
+  path: string,
+): Promise<{ path: string; bytes: Uint8Array; name: string }> {
+  let info: Stats;
+  try {
+    info = await stat(path);
+  } catch {
+    throw new Error(`speech_to_text file not found: ${path}`);
+  }
+  if (!info.isFile()) throw new Error(`speech_to_text file not found: ${path}`);
+  if (info.size > MAX_FILE_BYTES) throw new Error("speech_to_text file exceeds 500 MB");
+  const bytes = new Uint8Array(await readFile(path));
+  return { path, bytes, name: basename(path) || "audio" };
+}
+
+function multipartBody(
+  req: SpeechToTextRequest,
+  file?: { bytes: Uint8Array; name: string },
+): FormData {
   const form = new FormData();
   form.append("model", req.model);
   if (req.language) form.append("language", req.language);
   if (req.format) form.append("format", "true");
   if (req.diarize) form.append("diarize", "true");
   if (req.url) form.append("url", req.url);
-  if (req.file) {
-    form.append("file", new Blob([req.file.bytes]), req.file.name);
+  if (file) {
+    form.append("file", new Blob([file.bytes]), file.name);
   }
   return form;
 }
 
-export async function transcribeAudio(input: {
+export async function runSpeechToText(input: {
   token: string;
   request: SpeechToTextRequest;
   directory: string;
   artifactsDir: string;
   signal: AbortSignal;
 }): Promise<{ text: string; language?: string; duration?: number; file: ArtifactFile }> {
+  const file = input.request.path ? await readLocalAudio(input.request.path) : undefined;
   const response = await fetch(XAI_URL.stt, {
     method: "POST",
     signal: input.signal,
     headers: { Authorization: `Bearer ${input.token}` },
-    body: multipartBody(input.request),
+    body: multipartBody(input.request, file),
   });
   const raw = await response.text();
   if (!response.ok) {

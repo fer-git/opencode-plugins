@@ -1,4 +1,4 @@
-import { CONNECT_MESSAGE } from "./errors.ts";
+import { CONNECT_MESSAGE } from "./constants.ts";
 import type { IntegrationCtx } from "./types.ts";
 
 type Credential = {

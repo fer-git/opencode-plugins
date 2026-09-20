@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildImagineImageBody } from "../src/lib/imagine.ts";
+import { buildImagineImageBody } from "../src/features/imagine.ts";
 
 describe("buildImagineImageBody", () => {
   it("requires a prompt", () => {
@@ -33,6 +33,12 @@ describe("buildImagineImageBody", () => {
   it("rejects an unknown aspect_ratio", () => {
     expect(() => buildImagineImageBody({ prompt: "x", aspect_ratio: "9:99" }, "m")).toThrow(
       "aspect_ratio must be one of",
+    );
+  });
+
+  it.each([0, 11, 1.5])("rejects n=%s", (n) => {
+    expect(() => buildImagineImageBody({ prompt: "x", n }, "m")).toThrow(
+      "n must be an integer from 1 to 10",
     );
   });
 });

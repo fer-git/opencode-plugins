@@ -1,62 +1,59 @@
 import { describe, expect, it } from "vitest";
 
-import { toWebSearchResults } from "../src/lib/citations.ts";
-import { XAI_ORIGIN } from "../src/lib/constants.ts";
+import { collectHits, collectOutputText } from "../src/lib/citations.ts";
 
-describe("toWebSearchResults", () => {
-  it("returns no rows when the body has neither text nor urls", () => {
-    expect(toWebSearchResults({})).toEqual([]);
-  });
-
-  it("falls back to an xAI web search row when there is text but no urls", () => {
-    expect(toWebSearchResults({ output_text: "  hello  " })).toEqual([
-      {
-        url: `${XAI_ORIGIN}/`,
-        title: "xAI web search",
-        content: "hello",
-        time: {},
-      },
-    ]);
+describe("collectHits", () => {
+  it("returns no hits when the body has no urls", () => {
+    expect(collectHits({})).toEqual([]);
+    expect(collectHits({ output_text: "hello" })).toEqual([]);
   });
 
   it("uses citation urls and hostname titles", () => {
-    const results = toWebSearchResults({
-      output: [
-        {
-          type: "message",
-          content: [
-            {
-              type: "output_text",
-              text: "See [[1]](https://example.com/a).",
-              annotations: [{ type: "url_citation", url: "https://example.com/a" }],
-            },
-          ],
-        },
-      ],
-    });
-    expect(results).toEqual([
-      {
-        url: "https://example.com/a",
-        title: "example.com",
-        content: "See [[1]](https://example.com/a).",
-        time: {},
-      },
-    ]);
+    expect(
+      collectHits({
+        output: [
+          {
+            type: "message",
+            content: [
+              {
+                type: "output_text",
+                text: "See [[1]](https://example.com/a).",
+                annotations: [{ type: "url_citation", url: "https://example.com/a" }],
+              },
+            ],
+          },
+        ],
+      }),
+    ).toEqual([{ url: "https://example.com/a", title: "example.com" }]);
   });
 
   it("ignores non-http citations", () => {
     expect(
-      toWebSearchResults({
+      collectHits({
         citations: ["ftp://example.com/a", { url: "file:///tmp/a" }],
-        output_text: "only text",
       }),
-    ).toEqual([
-      {
-        url: `${XAI_ORIGIN}/`,
-        title: "xAI web search",
-        content: "only text",
-        time: {},
-      },
-    ]);
+    ).toEqual([]);
+  });
+});
+
+describe("collectOutputText", () => {
+  it("prefers output_text", () => {
+    expect(collectOutputText({ output_text: "  hello  " })).toBe("hello");
+  });
+
+  it("joins message output_text parts", () => {
+    expect(
+      collectOutputText({
+        output: [
+          {
+            type: "message",
+            content: [
+              { type: "output_text", text: "one" },
+              { type: "output_text", text: "two" },
+            ],
+          },
+        ],
+      }),
+    ).toBe("one\n\ntwo");
   });
 });

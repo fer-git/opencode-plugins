@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildImagineVideoBody } from "../src/lib/video.ts";
+import { buildImagineVideoBody } from "../src/features/video.ts";
 
 describe("buildImagineVideoBody", () => {
   it("requires a prompt", () => {
@@ -29,6 +29,12 @@ describe("buildImagineVideoBody", () => {
   it("rejects non-http image_url", () => {
     expect(() => buildImagineVideoBody({ prompt: "x", image_url: "ftp://x/a.png" }, "m")).toThrow(
       "image_url must be an http(s) URL",
+    );
+  });
+
+  it.each([0, 16])("rejects duration=%s", (duration) => {
+    expect(() => buildImagineVideoBody({ prompt: "x", duration }, "m")).toThrow(
+      "duration must be an integer from 1 to 15",
     );
   });
 });

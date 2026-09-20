@@ -8,7 +8,9 @@
 - New plugins are new directories under `packages/`. Do not dump a second plugin into `xai-extras` unless it is the same server `id`.
 - Stack: pnpm, `tsc --noEmit`, oxlint, oxfmt, vitest. No bun as package manager. No `Bun.spawn` in server plugins.
 - Paths must work on Windows, macOS, and Linux: `node:path` `join`, `pathToFileURL` for attachments, `fileURLToPath` for `file://` inputs. Do not concatenate `file://` onto a native path.
-- Shared constants live in `src/lib/constants.ts` (`UPPER_SNAKE` or a const object). Feature-local enums and limits stay in that feature file. Tiny helpers go in `src/lib/util.ts`. Keep `src/lib/` flat.
+- Shared constants live in `src/lib/constants.ts` (`UPPER_SNAKE` or a const object). Feature-local enums and limits stay in that feature file.
+- Layers: `src/index.ts` is the OpenCode adapter (L1). `src/lib/auth.ts` is SuperGrok bearer (L2). `src/features/*.ts` is one xAI product each (L3): pure `build*` + I/O `run*`. `src/lib/` is platform (errors, responses, citations, artifacts, options, util). Keep `lib/` and `features/` flat.
+- Import law: features must not import `types.ts`, `auth.ts`, `options.ts`, or `tool-content.ts`. `index.ts` must not call `xaiResponses` or write files. Auth must not import `errors.ts`. Artifacts must not build OpenCode `{ type: "file" }` parts (`tool-content.ts` does that).
 - Tests live in each package’s `test/` directory (not next to `src/`). Unit-only (builders/errors). Prefer `it.each` for tables. Do not mock xAI HTTP in CI. Live SuperGrok is a local smoke.
 - Package READMEs are for OpenCode V2 **end users**. No local home paths, no loader-bug notes, no changelog-in-README. Put maintainer notes here.
 - User-facing package changes need `pnpm changeset` (patch/minor/major). Do not hand-edit version numbers or invent tags. Release PRs come from `.github/workflows/release.yml`.

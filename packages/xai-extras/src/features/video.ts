@@ -1,7 +1,7 @@
-import { downloadBytes, ensureArtifactsDir, writeArtifact } from "./artifacts.ts";
-import { TIMEOUT_MS, XAI_URL } from "./constants.ts";
-import { parseXaiJson, xaiHttpError } from "./errors.ts";
-import { enumField, isHttpUrl } from "./util.ts";
+import { downloadBytes, ensureArtifactsDir, writeArtifact } from "../lib/artifacts.ts";
+import { XAI_URL } from "../lib/constants.ts";
+import { parseXaiJson, xaiHttpError } from "../lib/errors.ts";
+import { enumField, isHttpUrl } from "../lib/util.ts";
 
 const VIDEO_ASPECT = ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"] as const;
 const VIDEO_RESOLUTION = ["480p", "720p", "1080p"] as const;
@@ -91,12 +91,8 @@ async function sleep(ms: number, signal: AbortSignal) {
 }
 
 async function pollVideo(requestId: string, token: string, model: string, signal: AbortSignal) {
-  const started = Date.now();
   while (true) {
     if (signal.aborted) throw new Error("imagine_video aborted");
-    if (Date.now() - started > TIMEOUT_MS.video) {
-      throw new Error("imagine_video timed out waiting for xAI");
-    }
     const response = await fetch(XAI_URL.video(requestId), {
       signal,
       headers: { Authorization: `Bearer ${token}` },
@@ -136,7 +132,7 @@ async function pollVideo(requestId: string, token: string, model: string, signal
   }
 }
 
-export async function generateImagineVideo(input: {
+export async function runImagineVideo(input: {
   token: string;
   body: ImagineVideoBody;
   directory: string;

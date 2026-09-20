@@ -1,6 +1,9 @@
 export const PLUGIN_ID = "ferspective07.xai-extras";
 export const PACKAGE_NAME = "opencode-xai-extras";
 
+export const CONNECT_MESSAGE =
+  "xAI is not connected in OpenCode. Run /connect and choose xAI (SuperGrok or API key).";
+
 export const XAI_ORIGIN = "https://x.ai";
 export const XAI_API_BASE = "https://api.x.ai/v1";
 export const XAI_MODELS_DOCS = "https://docs.x.ai/developers/models";

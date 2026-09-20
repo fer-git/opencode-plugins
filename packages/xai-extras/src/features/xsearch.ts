@@ -1,5 +1,6 @@
-import { collectHits, collectOutputText } from "./citations.ts";
-import { MIN_QUERY_LENGTH } from "./constants.ts";
+import { collectHits, collectOutputText } from "../lib/citations.ts";
+import { MIN_QUERY_LENGTH } from "../lib/constants.ts";
+import { xaiResponses } from "../lib/responses.ts";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_HANDLES = 20;
@@ -109,6 +110,23 @@ export function formatXSearchMarkdown(body: Record<string, unknown>): string {
     }
   }
   return lines.join("\n") || "No X search results.";
+}
+
+export async function runXSearch(input: {
+  token: string;
+  query: string;
+  tool: XSearchTool;
+  model: string;
+  signal: AbortSignal;
+}): Promise<string> {
+  const body = await xaiResponses({
+    token: input.token,
+    model: input.model,
+    query: input.query,
+    tools: [input.tool],
+    signal: input.signal,
+  });
+  return formatXSearchMarkdown(body);
 }
 
 export const X_SEARCH_INPUT_SCHEMA = {

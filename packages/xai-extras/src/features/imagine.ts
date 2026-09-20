@@ -5,10 +5,10 @@ import {
   ensureArtifactsDir,
   writeArtifact,
   type ArtifactFile,
-} from "./artifacts.ts";
-import { XAI_URL } from "./constants.ts";
-import { parseXaiJson, xaiHttpError } from "./errors.ts";
-import { enumField } from "./util.ts";
+} from "../lib/artifacts.ts";
+import { XAI_URL } from "../lib/constants.ts";
+import { parseXaiJson, xaiHttpError } from "../lib/errors.ts";
+import { enumField } from "../lib/util.ts";
 
 const IMAGE_ASPECT = [
   "1:1",
@@ -93,7 +93,7 @@ function extFromMime(mime: string | undefined, url: string): string {
   return fromUrl || "jpg";
 }
 
-export async function generateImagineImages(input: {
+export async function runImagineImage(input: {
   token: string;
   body: ImagineImageBody;
   directory: string;

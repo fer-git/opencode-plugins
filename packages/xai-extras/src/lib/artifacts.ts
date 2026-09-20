@@ -1,7 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
 
 import { PACKAGE_NAME } from "./constants.ts";
 
@@ -38,18 +37,4 @@ export async function writeArtifact(dir: string, name: string, bytes: Uint8Array
   const path = join(dir, name);
   await writeFile(path, bytes);
   return path;
-}
-
-export function fileContents(files: Array<ArtifactFile>): Array<{
-  type: "file";
-  uri: string;
-  mime: string;
-  name: string;
-}> {
-  return files.map((file) => ({
-    type: "file" as const,
-    uri: pathToFileURL(file.path).href,
-    mime: file.mime,
-    name: file.name,
-  }));
 }

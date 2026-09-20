@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildXSearchTool, formatXSearchMarkdown } from "../src/lib/xsearch.ts";
+import { buildXSearchTool, formatXSearchMarkdown } from "../src/features/xsearch.ts";
 
 describe("buildXSearchTool", () => {
   it("requires a 2+ character query", () => {
@@ -29,6 +29,12 @@ describe("buildXSearchTool", () => {
     expect(() =>
       buildXSearchTool({ query: "news", from_date: "2026-02-01", to_date: "2026-01-01" }),
     ).toThrow("from_date must be on or before to_date");
+  });
+
+  it("rejects a non-ISO date", () => {
+    expect(() => buildXSearchTool({ query: "news", from_date: "02/01/2026" })).toThrow(
+      "from_date must be YYYY-MM-DD",
+    );
   });
 });
 

@@ -1,8 +1,28 @@
 // Auth: OpenCode /connect xAI SuperGrok. Do not import @opencode/plugin.
 
-import { fileContents } from "./lib/artifacts.ts";
+import {
+  buildImagineImageBody,
+  IMAGINE_IMAGE_INPUT_SCHEMA,
+  runImagineImage,
+} from "./features/imagine.ts";
+import {
+  buildSpeechToTextRequest,
+  runSpeechToText,
+  SPEECH_TO_TEXT_INPUT_SCHEMA,
+} from "./features/stt.ts";
+import {
+  buildTextToSpeechBody,
+  runTextToSpeech,
+  TEXT_TO_SPEECH_INPUT_SCHEMA,
+} from "./features/tts.ts";
+import {
+  buildImagineVideoBody,
+  IMAGINE_VIDEO_INPUT_SCHEMA,
+  runImagineVideo,
+} from "./features/video.ts";
+import { runWebSearch } from "./features/websearch.ts";
+import { buildXSearchTool, runXSearch, X_SEARCH_INPUT_SCHEMA } from "./features/xsearch.ts";
 import { isXaiAuthEvent, xaiBearer, xaiConnected } from "./lib/auth.ts";
-import { toWebSearchResults } from "./lib/citations.ts";
 import {
   DEFAULT_ARTIFACTS_DIR,
   DEFAULT_IMAGE_MODEL,
@@ -14,26 +34,10 @@ import {
   PLUGIN_ID,
   TIMEOUT_MS,
 } from "./lib/constants.ts";
-import {
-  buildImagineImageBody,
-  generateImagineImages,
-  IMAGINE_IMAGE_INPUT_SCHEMA,
-} from "./lib/imagine.ts";
-import { xaiResponses } from "./lib/responses.ts";
-import {
-  buildSpeechToTextRequest,
-  SPEECH_TO_TEXT_INPUT_SCHEMA,
-  transcribeAudio,
-} from "./lib/stt.ts";
-import { buildTextToSpeechBody, generateSpeech, TEXT_TO_SPEECH_INPUT_SCHEMA } from "./lib/tts.ts";
+import { optionBoolean, optionString } from "./lib/options.ts";
+import { fileContents } from "./lib/tool-content.ts";
 import type { PluginContext } from "./lib/types.ts";
-import { optionBoolean, optionString } from "./lib/util.ts";
-import {
-  buildImagineVideoBody,
-  generateImagineVideo,
-  IMAGINE_VIDEO_INPUT_SCHEMA,
-} from "./lib/video.ts";
-import { buildXSearchTool, formatXSearchMarkdown, X_SEARCH_INPUT_SCHEMA } from "./lib/xsearch.ts";
+import { toHostWebSearchResults } from "./lib/websearch-host.ts";
 
 function isAbortError(error: unknown, signal: AbortSignal): boolean {
   if (signal.aborted) return true;
@@ -66,14 +70,13 @@ export default {
             // Do not throw: the host maps provider execute failures to HTTP 503.
             if (q.length < MIN_QUERY_LENGTH) return [];
             const token = await xaiBearer(ctx);
-            const body = await xaiResponses({
+            const { hits, answer } = await runWebSearch({
               token,
-              model: searchModel,
               query: q,
-              tools: [{ type: "web_search" }],
+              model: searchModel,
               signal,
             });
-            return toWebSearchResults(body);
+            return toHostWebSearchResults(hits, answer);
           },
         });
       });
@@ -109,14 +112,14 @@ export default {
           const { query, tool: xTool } = buildXSearchTool(input as Record<string, unknown>);
           await tool.progress?.({ status: "x_search", query });
           const token = await xaiBearer(ctx);
-          const body = await xaiResponses({
+          const markdown = await runXSearch({
             token,
-            model: searchModel,
             query,
-            tools: [xTool],
+            tool: xTool,
+            model: searchModel,
             signal: AbortSignal.timeout(TIMEOUT_MS.xSearch),
           });
-          return { content: formatXSearchMarkdown(body) };
+          return { content: markdown };
         },
       });
       editor.add({
@@ -128,7 +131,7 @@ export default {
           const body = buildImagineImageBody(input as Record<string, unknown>, imageModel);
           await tool.progress?.({ status: "imagine_image", prompt: body.prompt });
           const token = await xaiBearer(ctx);
-          const { files } = await generateImagineImages({
+          const { files } = await runImagineImage({
             token,
             body,
             directory: ctx.location.directory,
@@ -152,7 +155,7 @@ export default {
           const body = buildImagineVideoBody(input as Record<string, unknown>, videoModel);
           await tool.progress?.({ status: "imagine_video", prompt: body.prompt });
           const token = await xaiBearer(ctx);
-          const file = await generateImagineVideo({
+          const file = await runImagineVideo({
             token,
             body,
             directory: ctx.location.directory,
@@ -176,13 +179,10 @@ export default {
           "Transcribe a local audio file or http(s) URL with Grok STT (xAI SuperGrok). Saves a .txt under .opencode/artifacts.",
         input: SPEECH_TO_TEXT_INPUT_SCHEMA,
         execute: async (input, tool) => {
-          const request = await buildSpeechToTextRequest(
-            input as Record<string, unknown>,
-            sttModel,
-          );
+          const request = buildSpeechToTextRequest(input as Record<string, unknown>, sttModel);
           await tool.progress?.({ status: "speech_to_text" });
           const token = await xaiBearer(ctx);
-          const result = await transcribeAudio({
+          const result = await runSpeechToText({
             token,
             request,
             directory: ctx.location.directory,
@@ -212,7 +212,7 @@ export default {
           const body = buildTextToSpeechBody(input as Record<string, unknown>, ttsVoice);
           await tool.progress?.({ status: "text_to_speech", voice: body.voice_id });
           const token = await xaiBearer(ctx);
-          const file = await generateSpeech({
+          const file = await runTextToSpeech({
             token,
             body,
             directory: ctx.location.directory,

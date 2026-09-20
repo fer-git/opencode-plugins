@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["unicorn", "typescript", "oxc", "import"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "env": { "node": true },
+  "ignorePatterns": ["**/node_modules/**", "**/dist/**"],
+  "overrides": [
+    {
+      "files": ["**/*.{test,spec}.ts"],
+      "plugins": ["unicorn", "typescript", "oxc", "import", "vitest"],
+      "env": { "node": true, "vitest": true }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "opencode-xai-extras",
+  "version": "0.0.1",
+  "private": true,
+  "description": "OpenCode V2 plugin: xAI SuperGrok web search, X search, Grok Imagine, speech-to-text, and text-to-speech.",
+  "keywords": [
+    "grok",
+    "opencode",
+    "opencode-plugin",
+    "xai"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fer-git/opencode-plugins.git",
+    "directory": "packages/xai-extras"
+  },
+  "files": [
+    "index.ts",
+    "src",
+    "README.md",
+    "!src/**/*.test.ts"
+  ],
+  "type": "module",
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts"
+  }
+}

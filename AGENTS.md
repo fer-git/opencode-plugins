@@ -6,7 +6,7 @@
 - Brand in user-facing copy: **xAI** (company), **Grok** / **SuperGrok** / **Grok Imagine** (products), **X (Twitter)** (not “Twitter-only”, not “xAI search”). Machine ids and npm stay lowercase `xai`. Prose “web search”; tool/config key `` `websearch` ``. Never XAI, Xai, or xAi.
 - Auth: `ctx.integration.connection` for xAI SuperGrok. Do not read `~/.grok`, spawn `grok`, or log Bearer tokens.
 - New plugins are new directories under `packages/`. Do not dump a second plugin into `xai-extras` unless it is the same server `id`.
-- Stack: pnpm, `tsc --noEmit`, oxlint, oxfmt, vitest. No bun as package manager. No `Bun.spawn` in server plugins.
+- Stack: pnpm, `tsc --noEmit`, oxlint `--deny-warnings`, oxfmt, vitest. No bun as package manager. No `Bun.spawn` in server plugins. TypeScript `strict` plus `exactOptionalPropertyTypes`, unused locals/params, `isolatedModules`, `erasableSyntaxOnly`. Do not enable `noPropertyAccessFromIndexSignature` (JSON `Record` access) or oxlint `pedantic` (false positives on sequential poll/`Record` JSON).
 - Paths must work on Windows, macOS, and Linux: `node:path` `join`, `pathToFileURL` for attachments, `fileURLToPath` for `file://` inputs. Do not concatenate `file://` onto a native path.
 - Shared constants live in `src/lib/constants.ts` (`UPPER_SNAKE` or a const object). Feature-local enums and limits stay in that feature file.
 - Layers: `src/index.ts` is the OpenCode adapter (L1). `src/lib/auth.ts` is SuperGrok bearer (L2). `src/features/*.ts` is one xAI product each (L3): pure `build*` + I/O `run*`. `src/lib/` is platform (errors, responses, citations, artifacts, options, util). Keep `lib/` and `features/` flat.

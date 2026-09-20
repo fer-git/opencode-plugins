@@ -141,8 +141,8 @@ export async function runSpeechToText(input: {
   const path = await writeArtifact(dir, name, new TextEncoder().encode(text));
   return {
     text,
-    language: typeof json.language === "string" ? json.language : undefined,
-    duration: typeof json.duration === "number" ? json.duration : undefined,
     file: { path, mime: "text/plain", name },
+    ...(typeof json.language === "string" ? { language: json.language } : {}),
+    ...(typeof json.duration === "number" ? { duration: json.duration } : {}),
   };
 }

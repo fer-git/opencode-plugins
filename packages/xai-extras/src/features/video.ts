@@ -167,5 +167,10 @@ export async function runImagineVideo(input: {
   const dir = await ensureArtifactsDir(input.directory, input.artifactsDir);
   const name = `imagine-video-${Date.now()}.mp4`;
   const path = await writeArtifact(dir, name, bytes);
-  return { path, mime: "video/mp4", name, duration: video.duration };
+  return {
+    path,
+    mime: "video/mp4",
+    name,
+    ...(video.duration !== undefined ? { duration: video.duration } : {}),
+  };
 }

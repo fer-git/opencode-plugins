@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit -p packages/xai-extras",
-    "lint": "oxlint",
+    "lint": "oxlint --deny-warnings",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "test": "vitest run",
@@ -19,6 +19,9 @@
     "oxlint": "^1.83.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   },
   "packageManager": "pnpm@12.5.1"
 }

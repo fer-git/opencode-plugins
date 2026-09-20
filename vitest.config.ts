@@ -4,6 +4,9 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["packages/*/test/**/*.test.ts"],
+    clearMocks: true,
     restoreMocks: true,
+    unstubEnvs: true,
+    unstubGlobals: true,
   },
 });

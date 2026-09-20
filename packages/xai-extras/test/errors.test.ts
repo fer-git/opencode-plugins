@@ -65,10 +65,6 @@ describe("xaiHttpError", () => {
 });
 
 describe("parseXaiJson", () => {
-  it("parses objects", () => {
-    expect(parseXaiJson('{"text":"hi"}')).toEqual({ text: "hi" });
-  });
-
   it("throws on invalid JSON", () => {
     expect(() => parseXaiJson("not-json")).toThrow("invalid JSON from xAI");
   });

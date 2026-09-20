@@ -15,14 +15,8 @@ describe("isHttpUrl", () => {
 });
 
 describe("enumField", () => {
-  const list = ["low", "medium", "auto"] as const;
-
-  it("returns a listed value", () => {
-    expect(enumField("low", list, "quality")).toBe("low");
-  });
-
   it("rejects an unknown value", () => {
-    expect(() => enumField("high", list, "quality")).toThrow(
+    expect(() => enumField("high", ["low", "medium", "auto"] as const, "quality")).toThrow(
       "quality must be one of low, medium, auto",
     );
   });

@@ -5,7 +5,7 @@ import { xaiResponses } from "../lib/responses.ts";
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_HANDLES = 20;
 
-export type XSearchInput = {
+type XSearchInput = {
   query?: unknown;
   allowed_x_handles?: unknown;
   excluded_x_handles?: unknown;
@@ -15,7 +15,7 @@ export type XSearchInput = {
   enable_video_understanding?: unknown;
 };
 
-export type XSearchTool = {
+type XSearchTool = {
   type: "x_search";
   allowed_x_handles?: string[];
   excluded_x_handles?: string[];

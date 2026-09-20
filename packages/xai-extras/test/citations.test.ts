@@ -34,6 +34,23 @@ describe("collectHits", () => {
       }),
     ).toEqual([]);
   });
+
+  it("collects web_search_call sources without duplicating citation urls", () => {
+    expect(
+      collectHits({
+        citations: ["https://example.com/a"],
+        output: [
+          {
+            type: "web_search_call",
+            action: { sources: [{ url: "https://example.com/a" }, "https://example.com/b"] },
+          },
+        ],
+      }),
+    ).toEqual([
+      { url: "https://example.com/a", title: "example.com" },
+      { url: "https://example.com/b", title: "example.com" },
+    ]);
+  });
 });
 
 describe("collectOutputText", () => {

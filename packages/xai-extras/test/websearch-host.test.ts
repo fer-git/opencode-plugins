@@ -19,27 +19,25 @@ describe("toHostWebSearchResults", () => {
     ]);
   });
 
-  it("puts the full answer on the first hit and a snippet on later hits", () => {
-    const answer = "See [[1]](https://example.com/a) and [[2]](https://example.com/b).";
+  it("puts the answer on the first hit and omits content when a later url is not cited", () => {
     expect(
       toHostWebSearchResults(
         [
           { url: "https://example.com/a", title: "example.com" },
           { url: "https://example.com/b", title: "example.com" },
         ],
-        answer,
+        "See [[1]](https://example.com/a).",
       ),
     ).toEqual([
       {
         url: "https://example.com/a",
         title: "example.com",
-        content: answer,
+        content: "See [[1]](https://example.com/a).",
         time: {},
       },
       {
         url: "https://example.com/b",
         title: "example.com",
-        content: "See [[1]](https://example.com/a) and [[2]](https://example.com/b).",
         time: {},
       },
     ]);

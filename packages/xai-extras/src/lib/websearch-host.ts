@@ -3,7 +3,7 @@ import { XAI_ORIGIN } from "./constants.ts";
 
 const SNIPPET_RADIUS = 220;
 
-export type WebSearchResult = {
+type WebSearchResult = {
   url: string;
   title?: string;
   content?: string;

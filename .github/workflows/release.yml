@@ -25,9 +25,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: changesets/action@v2
         with:
-          title: Version packages
-          commit: Version packages
-          version: pnpm changeset version
-          publish: pnpm release
+          pr-title: Version packages
+          commit-message: Version packages
+          version-script: pnpm changeset version
+          publish-script: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -23,4 +23,4 @@ After a user-facing change, record it:
 pnpm changeset
 ```
 
-On GitHub, merging to `main` opens a **Version packages** PR. Merging that PR bumps versions, updates each package CHANGELOG, creates git tags plus GitHub Releases (`opencode-xai-extras@x.y.z`), and publishes public packages to npm via trusted publishing.
+On GitHub, pushing user-facing changes to `main` opens a **Version packages** PR. CI must pass; that PR is then merged automatically. That bump updates CHANGELOG, creates git tags plus GitHub Releases (`opencode-xai-extras@x.y.z`), and publishes to npm via trusted publishing.

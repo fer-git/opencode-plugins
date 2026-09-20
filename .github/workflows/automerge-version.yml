@@ -1,0 +1,33 @@
+name: Automerge version PR
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+concurrency:
+  group: automerge-version-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  merge:
+    if: github.head_ref == 'changeset-release/main' && github.event.pull_request.user.login == 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for CI and merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          for _ in $(seq 1 36); do
+            if gh pr checks "$PR" >/dev/null 2>&1; then
+              break
+            fi
+            sleep 5
+          done
+          gh pr checks "$PR" --watch --fail-fast
+          gh pr merge "$PR" --merge --delete-branch

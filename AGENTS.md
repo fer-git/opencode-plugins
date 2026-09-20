@@ -61,4 +61,6 @@ Tests are unit-only (builders, errors, host mappers). Prefer `it.each` for table
 
 Package READMEs are for OpenCode V2 **end users**. No local home paths, no loader-bug notes, no changelog-in-README.
 
-User-facing package changes need `pnpm changeset` (patch/minor/major). Do not hand-edit version numbers or invent tags. Release PRs come from `.github/workflows/release.yml`. npm publishes from that workflow via trusted publishing (OIDC), not a laptop token.
+User-facing package changes need a changeset. Agents write `.changeset/<slug>.md` (the `pnpm changeset` CLI is interactive). Do not hand-edit version numbers or invent tags.
+
+Ship loop from this TUI: edit → `pnpm check` → changeset file if user-facing → commit → `git push origin main`. GitHub then: CI → Version packages PR → automerge after CI green → tag + GitHub Release + npm (OIDC). Do not `npm publish` from a laptop. Do not open the website to merge or publish.

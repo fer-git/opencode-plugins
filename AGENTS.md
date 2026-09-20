@@ -62,6 +62,23 @@ Tests are unit-only (builders, errors, host mappers). Prefer `it.each` for table
 
 Package READMEs are for OpenCode V2 **end users**. No local home paths, no loader-bug notes, no changelog-in-README.
 
-User-facing package changes need a changeset. Agents write `.changeset/<slug>.md` (the `pnpm changeset` CLI is interactive). Do not hand-edit version numbers or invent tags.
+## Changesets and release notes
+
+A push to `main` is **not** a release. The intent signal is a changeset file in the **same** commit as the work.
+
+- **User-facing** (tools, errors, README, options, install): add `.changeset/<slug>.md`. Agents write that file; do not run interactive `pnpm changeset`.
+- **Internal-only** (AGENTS.md, CI, tests, comments): no changeset → no version, no changelog line, no npm publish.
+
+The markdown **after** the frontmatter **is** the release note. Changesets concatenates those into `packages/<name>/CHANGELOG.md` and the GitHub Release body. Do not hand-edit `CHANGELOG.md`, version numbers, or git tags.
+
+```md
+---
+"opencode-xai-extras": patch
+---
+
+Short web search queries return no results instead of HTTP 503.
+```
+
+Use `patch` / `minor` / `major` as appropriate. Name the package(s) that actually changed.
 
 Ship loop from this TUI: edit → `pnpm check` → changeset file if user-facing → commit → `git push origin main`. GitHub then: CI → Version packages PR → automerge after CI green → tag + GitHub Release + npm (OIDC). Do not `npm publish` from a laptop. Do not open the website to merge or publish.

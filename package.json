@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit -p packages/xai-extras",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "new-plugin": "node scripts/new-plugin.mjs",
     "lint": "oxlint --deny-warnings",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",

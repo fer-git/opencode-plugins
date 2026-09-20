@@ -1,12 +1,10 @@
 {
-  "name": "opencode-xai-extras",
-  "version": "0.0.2",
-  "description": "OpenCode V2 plugin: xAI SuperGrok web search, X search, Grok Imagine, speech-to-text, and text-to-speech.",
+  "name": "{{npmName}}",
+  "version": "0.0.1",
+  "description": "OpenCode V2 plugin.",
   "keywords": [
-    "grok",
     "opencode",
-    "opencode-plugin",
-    "xai"
+    "opencode-plugin"
   ],
   "bugs": {
     "url": "https://github.com/fer-git/opencode-plugins/issues"
@@ -15,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fer-git/opencode-plugins.git",
-    "directory": "packages/xai-extras"
+    "directory": "packages/{{dirName}}"
   },
   "files": [
     "index.ts",

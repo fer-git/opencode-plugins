@@ -10,6 +10,7 @@ Maintainer rules for this repo. End-user copy lives in each package README.
 - Auth is OpenCode `/connect` xAI SuperGrok (`ctx.integration.connection`). Not Grok Build. Do not read `~/.grok`, spawn `grok`, or log Bearer tokens.
 - File STT/TTS only. No microphone, prompt dictation, Speech-to-Speech, or TUI playback.
 - New plugins are new directories under `packages/`. Do not dump a second plugin into `xai-extras` unless it is the same server `id`.
+- Scaffold with `pnpm new-plugin <kebab-name>` (npm `opencode-<name>`, plugin id `ferspective07.<name>`). Then add a root README table row. Shared code that two plugins need becomes a new workspace package under `packages/` (not a copy of extras). Do not introduce bun, Nx, or Turbo. Independently version via Changesets (already configured).
 
 ## Brand
 

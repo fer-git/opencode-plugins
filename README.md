@@ -15,7 +15,15 @@ pnpm install
 pnpm check
 ```
 
-Requires [pnpm](https://pnpm.io). `pnpm check` runs typecheck, oxlint, oxfmt, and Vitest.
+Requires [pnpm](https://pnpm.io). `pnpm check` runs typecheck (every `packages/*`), oxlint, oxfmt, and Vitest.
+
+New plugin:
+
+```sh
+pnpm new-plugin session-foo
+```
+
+That creates `packages/session-foo` (npm `opencode-session-foo`, plugin id `ferspective07.session-foo`). Add a row to the table above. Each package versions and publishes independently through Changesets.
 
 After a user-facing change, record it:
 
